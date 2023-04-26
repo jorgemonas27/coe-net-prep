@@ -1,37 +1,32 @@
-﻿using Backend.API.Services;
+﻿using Backend.API.Models;
+using Backend.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using System.Net;
 
 namespace Backend.API.Controllers
 {
     [ApiController, Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        [AllowAnonymous, HttpPost("login/{username}")]
-        public object Authenticate(string username, [FromServices]AuthTokenService service)
+        //endpoint to create get a token for a user.
+        [AllowAnonymous, HttpPost("login/")]
+        public object Authenticate([FromBody]UserData data, [FromServices]AuthTokenService service)
         {
-            var claims = new List<Claim>();
-            claims.Add(new Claim("username", username));
-            claims.Add(new Claim("displayname", username));
-
-            // Add roles as multiple claims
-            //foreach(var role in user.Roles) 
-            //{
-            //    claims.Add(new Claim(ClaimTypes.Role, role.Name));
-            //}
-            // Optionally add other app specific claims as needed
-            claims.Add(new Claim("UserState", "Active"));
-
             // create a new token with token helper and add our claim
             // from `Westwind.AspNetCore`  NuGet Package
-            var token = service.GenerateToken(username, claims.ToArray());
+            var token = service.GenerateToken(data);
+
+            if (token == null) 
+            {
+                return Content($"{HttpStatusCode.Forbidden} invalid_grant, Provided username and password is incorrect");
+            }
 
             return new
             {
                 access_token = new JwtSecurityTokenHandler().WriteToken(token),
-                expires = token.ValidTo
+                expires = token?.ValidTo
             };
         }
     }

@@ -15,20 +15,29 @@ namespace Backend.API.Services
         {
             _settings = optionsMonitor.CurrentValue;
         }
-         public JwtSecurityToken GenerateToken(string username, Claim[]? additionalClaims = null)
-        {
-            var claims = new[]
-            {
-            new Claim(JwtRegisteredClaimNames.Sub,username),
-            // this guarantees the token is unique
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
 
-            if (additionalClaims is object)
+        public JwtSecurityToken? GenerateToken(UserData data)
+        {
+            var claims = new List<Claim>();
+
+            if (data.Username == "superAdmin" && data.Password == "pass")
             {
-                var claimList = new List<Claim>(claims);
-                claimList.AddRange(additionalClaims);
-                claims = claimList.ToArray();
+                claims.Add(new Claim(ClaimTypes.Role, "admin"));
+                GenerateClaims(data, claims);
+            }
+            else if (data.Username == "peter" && data.Password == "pass")
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "user"));
+                GenerateClaims(data, claims);
+            }
+            else if (data.Username == "charlie" && data.Password == "pass")
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "it operator"));
+                GenerateClaims(data, claims);
+            }
+            else
+            {
+                return null;
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SigningKey));
@@ -42,7 +51,14 @@ namespace Backend.API.Services
                 signingCredentials: creds
             );
         }
-
-
+        private void GenerateClaims(UserData data, List<Claim> claims)
+        {
+            claims.Add(new Claim("username", data.Username));
+            claims.Add(new Claim(ClaimTypes.Name, $"User: {data.Username}"));
+            claims.Add(new Claim("UserState", "Active"));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, data.Username));
+            // this guarantees the token is unique
+            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+        }
     }
 }
