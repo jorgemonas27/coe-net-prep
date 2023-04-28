@@ -5,12 +5,11 @@ using System.Security.Claims;
 
 namespace Backend.API.Controllers
 {
-    [ApiController]
+    [ApiController, Route("api/data")]
     public class LoginController : ControllerBase
     {
         [Authorize]
         [HttpGet]
-        [Route("api/getData")]
         public object GetData()
         {
             var identity = (ClaimsIdentity)User.Identity!;
@@ -19,21 +18,21 @@ namespace Backend.API.Controllers
 
         [Authorize(Roles = "admin")]
         [HttpGet]
-        [Route("api/getDataAdmin")]
+        [Route("admin/")]
         public object GetDataForAdmin()
         {
             var identity = (ClaimsIdentity)User.Identity!;
             var role = identity.Claims
                         .Where(claim => claim.Type == ClaimTypes.Role)
                         .Select(claim => claim.Value)
-            .First();
+                        .First();
 
             return Ok($"Hello {identity.Name} Role: {role}.");
         }
 
         [Authorize(Roles = "user")]
         [HttpGet]
-        [Route("api/getDataUser")]
+        [Route("user/")]
         public object GetDataForUser()
         {
             var identity = (ClaimsIdentity)User.Identity!;
@@ -47,7 +46,7 @@ namespace Backend.API.Controllers
 
         [Authorize(Roles = "it operator")]
         [HttpGet]
-        [Route("api/getDataIt")]
+        [Route("it/")]
         public object GetDataForIt()
         {
             var identity = (ClaimsIdentity)User.Identity!;

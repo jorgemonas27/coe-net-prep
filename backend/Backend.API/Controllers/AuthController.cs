@@ -10,17 +10,24 @@ namespace Backend.API.Controllers
     [ApiController, Route("api/auth")]
     public class AuthController : ControllerBase
     {
+        private List<UserInformation> _users = new List<UserInformation>();
+
+        public AuthController()
+        {
+            _users = DeserializeUsers();
+        }
+
         //endpoint to create get a token for a user.
         [AllowAnonymous, HttpPost("login/")]
-        public object Authenticate([FromBody]UserData data, [FromServices]AuthTokenService service)
+        public object Authenticate([FromBody]UserLoginData data, [FromServices]AuthTokenService service)
         {
             // create a new token with token helper and add our claim
             // from `Westwind.AspNetCore`  NuGet Package
-            var token = service.GenerateToken(data);
+            var token = service.GenerateToken(data, _users);
 
             if (token == null) 
             {
-                return Content($"{HttpStatusCode.Forbidden} invalid_grant, Provided username and password is incorrect");
+                return HttpStatusCode.Forbidden;
             }
 
             return new
@@ -28,6 +35,12 @@ namespace Backend.API.Controllers
                 access_token = new JwtSecurityTokenHandler().WriteToken(token),
                 expires = token?.ValidTo
             };
+        }
+
+        private List<UserInformation> DeserializeUsers()
+        {
+            GetJsonUsersInformationService jsonService = new GetJsonUsersInformationService();
+            return jsonService.GetAllUsersInformation();
         }
     }
 }
