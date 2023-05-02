@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Backend.API.Services
 {
-    public class GetJsonUsersInformationService : IGetUsersInformation
+    public class JsonUsersInformationService : IUsersInformation
     {
         public List<UserInformation> GetAllUsersInformation()
         {

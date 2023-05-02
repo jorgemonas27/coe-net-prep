@@ -3,7 +3,7 @@
 namespace Backend.API.Services
 {
     // this interface was created in order to get users from different sources, json files, dbs, etc.
-    public interface IGetUsersInformation
+    public interface IUsersInformation
     {
         List<UserInformation> GetAllUsersInformation();
     }

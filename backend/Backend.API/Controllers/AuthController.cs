@@ -14,7 +14,8 @@ namespace Backend.API.Controllers
 
         public AuthController()
         {
-            _users = DeserializeUsers();
+            UsersGetter getter = new UsersGetter(new JsonUsersInformationService());
+            _users = getter.GetUsers();
         }
 
         //endpoint to create get a token for a user.
@@ -35,12 +36,6 @@ namespace Backend.API.Controllers
                 access_token = new JwtSecurityTokenHandler().WriteToken(token),
                 expires = token?.ValidTo
             };
-        }
-
-        private List<UserInformation> DeserializeUsers()
-        {
-            GetJsonUsersInformationService jsonService = new GetJsonUsersInformationService();
-            return jsonService.GetAllUsersInformation();
         }
     }
 }
