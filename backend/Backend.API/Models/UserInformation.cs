@@ -12,6 +12,5 @@
         public string Phone { get; set; } = string.Empty;
         public string Website { get; set; } = string.Empty;
         public Company? Company { get; set; }
-
     }
 }

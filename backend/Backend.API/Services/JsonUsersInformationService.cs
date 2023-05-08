@@ -5,10 +5,12 @@ namespace Backend.API.Services
 {
     public class JsonUsersInformationService : IUsersInformation
     {
-        public List<UserInformation> GetAllUsersInformation()
+        public List<UserInformation> Users { get; } = new List<UserInformation>();
+
+        public JsonUsersInformationService()
         {
             var json = File.ReadAllText("usersdb.json");
-            return JsonConvert.DeserializeObject<List<UserInformation>>(json)!;
+            Users = JsonConvert.DeserializeObject<List<UserInformation>>(json) ?? new List<UserInformation>();
         }
     }
 }

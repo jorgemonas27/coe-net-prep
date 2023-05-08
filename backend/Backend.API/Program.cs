@@ -8,6 +8,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 {
     builder.Services.AddScoped<AuthTokenService>();
+    builder.Services.AddSingleton<IUsersInformation, JsonUsersInformationService>();
     builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(nameof(JwtSettings)));
     var jwtSettings = new JwtSettings();
     builder.Configuration.Bind(key: nameof(JwtSettings), instance: jwtSettings);
